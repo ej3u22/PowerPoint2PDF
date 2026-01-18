@@ -78,20 +78,23 @@ Sub Next_Step(Arg)
     Dim FolderArg, Result
     Result = Determine_Type(Arg)
     If Result = "PowerPoint" Then
+        Count = Count + 1
         ConvertPowerPoint Arg
     ElseIf Result = "FOLDER" Then
         For Each FolderArg in objFSO.GetFolder(Arg).Files
             Call Next_Step(FolderArg)
         Next
     ElseIf Result = "N/A" Then
+        Count = Count + 1
         MsgBox "The given file isn't compatible. Filename; " & Arg & vbNewLine & "Make sure the file has a valid extension: PPT, PPTX, PPSX", 32, "Converter"
+    ElseIf Result = "IGNORE" Then
+        Count = Count + 1
     End If
 End Sub
 
 Sub RunLoop(ThisArg)
     Dim Arg
     For Each Arg in ThisArg
-        Count = Count + 1
         Next_Step Arg
     Next
 End Sub
