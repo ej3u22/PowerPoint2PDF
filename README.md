@@ -3,8 +3,9 @@ Hi there! This is a very simple vbs script that takes ppt, pptx, ppsx inputs and
 I've been using a Remarkable 2 tablet for revision and found this is a more usable/manageable format for lectures with lots of slides.
 
 ## Files
-Either drag and drop the file/folder of files you're wanting to convert onto the vbs script, or in the command line (using cscript) ``cscript Converter.vbs <file>``
+Either drag and drop the file/folder of files you're wanting to convert onto the vbs script, or in the command line (using cscript) ``cscript Converter.vbs "<file>"``
 cscript may not be natively installed.
+The path should be used within speech marks, otherwise OneDrive or other cloud platforms may reject the attempt.
 
 ## Output
 Bit of a misnomer when considering this as a "converter", it doesn't convert anything, it just allows for a single or a batch of files to be exported. They are exported with the same name into the same directory, it is worth noting that this means there will be *duplicates* of whatever filename you have. 
