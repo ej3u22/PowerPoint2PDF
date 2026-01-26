@@ -9,6 +9,10 @@ cscript may not be natively installed.
 ## Output
 Bit of a misnomer when considering this as a "converter", it doesn't convert anything, it just allows for a single or a batch of files to be exported. They are exported with the same name into the same directory, it is worth noting that this means there will be *duplicates* of whatever filename you have. 
 
+## Keeping tidy
+The script also tries to ensure that you aren't then looking at a list of files doubled up; 
+If you attempt to pass a directory to it, it won't just convert it in place, instead it will move the PowerPoints into a sub directory, cleverly named... "PowerPoint". If you need to see them again, open the folder and find it there! This also means that you don't have to re-do the entire folder conversion if you only need to add one or two, just add the additional powerpoints and they'll automatically sort themselves out.
+
 ## How does it work?
 - Is this a file or a folder?
 - If it's a file, is it a file I can export with?
