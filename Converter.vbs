@@ -15,6 +15,7 @@ Function Determine_Type(ThisArg)
     sourcePath = objFSO.GetAbsolutePathName(ThisArg)
     If objFSO.FolderExists(sourcePath) Then
         Determine_Type = "FOLDER"
+        Exit Function
     ElseIf objFSO.FileExists(sourcePath) Then
         ext = LCase(objFSO.GetExtensionName(ThisArg))
         If (ext <> "pptx") And (ext <> "ppt") And (ext <> "ppsx") And (ext <> "pdf") Then
@@ -28,6 +29,8 @@ Function Determine_Type(ThisArg)
     End If
     Exit Function
 End Function
+
+Dim flaggedFiles 'List of files flagged to be moved later on
 
 Sub ConvertPowerPoint(ThisArg)
     ' Takes the file path, 
@@ -45,6 +48,7 @@ Sub ConvertPowerPoint(ThisArg)
 
     If Err.Number <> 0 Then
         MsgBox "Error opening file: " & sourcePath & " | " & Err.Description, 16, "Debug Info"
+        objPPT.Close
         objPPT.Quit 'Make sure to close the applicaiton, otherwise it'll hang for minutes.
         WScript.Quit
     End If
@@ -74,12 +78,42 @@ Sub ConvertPowerPoint(ThisArg)
     Set objPPT = Nothing
 End Sub
 
+Sub Tidy_Folder(Arg)
+    'Ensure we are only considering a directory
+    If not Determine_Type(Arg) = "FOLDER" Then
+        Exit Sub
+    End If
+    dim TargetDirectory
+    'Find a subdirectory called "PowerPoint", If no subdirectory exists, create one
+    if Not objFSO.FolderExists(Arg&"\PowerPoint") Then
+        objFSO.CreateFolder Arg&"\PowerPoint"
+    end if
+    TargetDirectory = objFSO.GetFolder(Arg&"\PowerPoint")
+    'Iterate through the flaggedFiles and move them into the new destination
+    Dim f_file
+    for Each f_file in flaggedFiles
+        'Move directory
+        objFSO.MoveFile objFSO.GetAbsolutePathName(f_file), TargetDirectory&"\"&objFSO.GetFileName(f_file)
+    Next
+End Sub 
+
+' vba arrays are of fixed length, we are creating a new +1 length array for every new element, because we cannot natively increase it's size.
+Function AddItem(arr, val)
+    ReDim Preserve arr(UBound(arr) + 1)
+    arr(UBound(arr)) = val
+    AddItem = arr
+End Function
+
+' Initialize our array
+flaggedFiles = Array()
+
 Sub Next_Step(Arg)
     Dim FolderArg, Result
     Result = Determine_Type(Arg)
     If Result = "PowerPoint" Then
         Count = Count + 1
         ConvertPowerPoint Arg
+        flaggedFiles = AddItem(flaggedFiles, Arg) 'Tag the appropriate folder
     ElseIf Result = "FOLDER" Then
         For Each FolderArg in objFSO.GetFolder(Arg).Files
             Call Next_Step(FolderArg)
@@ -96,6 +130,7 @@ Sub RunLoop(ThisArg)
     Dim Arg
     For Each Arg in ThisArg
         Next_Step Arg
+        Tidy_Folder Arg
     Next
 End Sub
 
